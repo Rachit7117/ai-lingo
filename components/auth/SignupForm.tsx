@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { signUp } from '@/actions/auth'
 import { track } from '@/lib/posthog/events'
+import { LoadingScreen } from '@/components/ui/LoadingScreen'
 
 export function SignupForm() {
   const [error, setError] = useState<string | null>(null)
@@ -26,7 +27,15 @@ export function SignupForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <>
+      {loading && (
+        <LoadingScreen
+          mood="celebrating"
+          messages={['Setting up your account…', 'Building your learning path…', 'Byte is getting excited to meet you…']}
+          interval={1500}
+        />
+      )}
+      <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="name">Full Name</Label>
         <Input id="name" name="name" type="text" placeholder="Ada Lovelace" required />
@@ -43,6 +52,7 @@ export function SignupForm() {
       <Button type="submit" className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl" disabled={loading}>
         {loading ? 'Creating account…' : 'Create Account'}
       </Button>
-    </form>
+      </form>
+    </>
   )
 }

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { signIn } from '@/actions/auth'
 import { track } from '@/lib/posthog/events'
+import { LoadingScreen } from '@/components/ui/LoadingScreen'
 
 export function LoginForm() {
   const [error, setError] = useState<string | null>(null)
@@ -26,7 +27,15 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <>
+      {loading && (
+        <LoadingScreen
+          mood="excited"
+          messages={['Logging you in…', 'Warming up Byte…', 'Loading your progress…']}
+          interval={1500}
+        />
+      )}
+      <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input id="email" name="email" type="email" placeholder="you@example.com" required />
@@ -39,6 +48,7 @@ export function LoginForm() {
       <Button type="submit" className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl" disabled={loading}>
         {loading ? 'Signing in…' : 'Sign In'}
       </Button>
-    </form>
+      </form>
+    </>
   )
 }

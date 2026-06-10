@@ -7,6 +7,7 @@ import { completeOnboarding } from '@/actions/onboarding'
 import { track } from '@/lib/posthog/events'
 import { cn } from '@/lib/utils'
 import { Byte } from '@/components/mascot/Byte'
+import { LoadingScreen } from '@/components/ui/LoadingScreen'
 
 const levels = [
   { value: 'beginner', label: 'Beginner', emoji: '🌱', desc: 'New to AI — start from scratch' },
@@ -43,7 +44,21 @@ export function OnboardingFlow() {
   }
 
   return (
-    <div className="max-w-md mx-auto px-4 py-12">
+    <>
+      {loading && (
+        <LoadingScreen
+          mood="celebrating"
+          messages={[
+            'Customizing your learning path…',
+            `Tailoring content for ${level} level…`,
+            'Picking your first lessons…',
+            'Setting up your daily goal…',
+            'Almost ready to learn…',
+          ]}
+          interval={1600}
+        />
+      )}
+      <div className="max-w-md mx-auto px-4 py-12">
       <div className="flex gap-2 mb-8">
         {[1, 2].map(s => (
           <div key={s} className={cn('h-2 flex-1 rounded-full transition-all', step >= s ? 'bg-green-500' : 'bg-gray-100')} />
@@ -121,6 +136,7 @@ export function OnboardingFlow() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+      </div>
+    </>
   )
 }
