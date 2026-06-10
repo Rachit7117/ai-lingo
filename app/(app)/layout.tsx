@@ -1,9 +1,11 @@
 import { redirect } from 'next/navigation'
+import { unstable_noStore as noStore } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { getProfile } from '@/actions/progress'
 import { AppNav } from '@/components/layout/AppNav'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  noStore()
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
