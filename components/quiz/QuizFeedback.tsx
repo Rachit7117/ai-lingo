@@ -23,7 +23,7 @@ export function QuizFeedback({ feedback, onNext }: Props) {
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: 100, opacity: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      className={`fixed bottom-0 left-0 right-0 p-6 border-t-2 ${
+      className={`fixed bottom-0 left-0 right-0 z-[60] px-6 pt-6 pb-8 border-t-2 max-h-[80vh] overflow-y-auto [padding-bottom:max(2rem,env(safe-area-inset-bottom))] ${
         isCorrect
           ? 'bg-green-50 border-green-300'
           : 'bg-red-50 border-red-300'

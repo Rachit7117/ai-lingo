@@ -14,6 +14,7 @@ import { Progress } from '@/components/ui/progress'
 import { submitQuiz } from '@/actions/quiz'
 import { track } from '@/lib/posthog/events'
 import { Byte } from '@/components/mascot/Byte'
+import { LoadingScreen } from '@/components/ui/LoadingScreen'
 
 interface QuizEngineProps {
   questions: Question[]
@@ -40,6 +41,7 @@ export function QuizEngine({ questions, lessonId, lessonSlug, lessonTitle, track
   const [result, setResult] = useState<QuizResult | null>(null)
   const [startedAt] = useState(Date.now())
   const [xpEarned, setXpEarned] = useState(0)
+  const [submitting, setSubmitting] = useState(false)
 
   const currentQuestion = questions[currentIndex]
   const progress = ((currentIndex) / questions.length) * 100
@@ -86,6 +88,8 @@ export function QuizEngine({ questions, lessonId, lessonSlug, lessonTitle, track
         timeTakenMs,
       }
 
+      setSubmitting(true)
+
       await submitQuiz({
         lessonId,
         score,
@@ -114,6 +118,21 @@ export function QuizEngine({ questions, lessonId, lessonSlug, lessonTitle, track
       setCurrentIndex(prev => prev + 1)
     }
   }, [currentIndex, questions, hearts, feedback, answers, xpEarned, lessonId, startedAt])
+
+  if (submitting && !result) {
+    return (
+      <LoadingScreen
+        mood="thinking"
+        messages={[
+          'Tallying up your score…',
+          'Counting your XP…',
+          'Updating your streak…',
+          'Byte is grading your quiz…',
+        ]}
+        interval={1400}
+      />
+    )
+  }
 
   if (result) {
     return (
