@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getLesson } from '@/actions/lessons'
 import { getQuestionsForLesson } from '@/actions/quiz'
+import { getQuestionsForLevel } from '@/actions/quizVariants'
+import { getProfile } from '@/actions/progress'
 import { QuizEngine } from '@/components/quiz/QuizEngine'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft } from 'lucide-react'
@@ -21,7 +23,19 @@ export default async function QuizPage({ params }: Props) {
   const lesson = await getLesson(trackSlug, lessonSlug)
   if (!lesson) notFound()
 
-  const questions = await getQuestionsForLesson(lesson.id)
+  const [baseQuestions, profile] = await Promise.all([
+    getQuestionsForLesson(lesson.id),
+    getProfile(),
+  ])
+
+  const level = profile?.experience_level ?? 'intermediate'
+  const questions = await getQuestionsForLevel(
+    lesson.id,
+    lesson.title,
+    lesson.explanation,
+    level,
+    baseQuestions
+  )
 
   if (questions.length === 0) {
     return (
