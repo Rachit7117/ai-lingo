@@ -1,12 +1,13 @@
 'use server'
 
-import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
-export async function completeOnboarding(formData: FormData) {
+type OnboardingResult = { success: true } | { error: string }
+
+export async function completeOnboarding(formData: FormData): Promise<OnboardingResult> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  if (!user) return { error: 'Not signed in' }
 
   const level = formData.get('level') as string
   const dailyGoal = parseInt(formData.get('daily_goal') as string, 10)
@@ -19,7 +20,7 @@ export async function completeOnboarding(formData: FormData) {
 
   // If the profile write itself fails, surface it instead of silently looping.
   if (updateError) {
-    throw new Error(`Failed to save onboarding: ${updateError.message}`)
+    return { error: `Failed to save onboarding: ${updateError.message}` }
   }
 
   // Initialize progress rows. This is non-critical for completing onboarding —
@@ -29,5 +30,6 @@ export async function completeOnboarding(formData: FormData) {
     console.error('initialize_user_progress failed (non-fatal):', rpcError.message)
   }
 
-  redirect('/learn')
+  // Navigation is handled client-side (router.push) for reliable redirect.
+  return { success: true }
 }

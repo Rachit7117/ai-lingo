@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { completeOnboarding } from '@/actions/onboarding'
@@ -22,6 +23,7 @@ const goals = [
 ]
 
 export function OnboardingFlow() {
+  const router = useRouter()
   const [step, setStep] = useState(1)
   const [level, setLevel] = useState('')
   const [goal, setGoal] = useState('')
@@ -43,15 +45,19 @@ export function OnboardingFlow() {
     fd.append('level', level)
     fd.append('daily_goal', goal)
     try {
-      await completeOnboarding(fd)
-    } catch (e) {
-      // A redirect from the server action lands here as a non-error; only show
-      // a message for real failures so the user isn't stuck on a blank loader.
-      const msg = e instanceof Error ? e.message : ''
-      if (!msg.includes('NEXT_REDIRECT')) {
+      const result = await completeOnboarding(fd)
+      if ('error' in result) {
         setError('Something went wrong saving your setup. Please try again.')
         setLoading(false)
+        return
       }
+      // Reliable client-side navigation. refresh() makes the (app) layout
+      // re-read the now-completed profile before we land on /learn.
+      router.refresh()
+      router.push('/learn')
+    } catch {
+      setError('Something went wrong saving your setup. Please try again.')
+      setLoading(false)
     }
   }
 
