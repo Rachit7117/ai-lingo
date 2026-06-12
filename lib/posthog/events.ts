@@ -18,13 +18,26 @@ type EventMap = {
 }
 
 export function track<E extends keyof EventMap>(event: E, props: EventMap[E]) {
-  posthog.capture(event, props)
+  // Analytics must never break the user flow — swallow any error.
+  try {
+    posthog.capture(event, props)
+  } catch (e) {
+    console.warn('posthog capture failed:', e)
+  }
 }
 
 export function identify(userId: string, traits?: Record<string, unknown>) {
-  posthog.identify(userId, traits)
+  try {
+    posthog.identify(userId, traits)
+  } catch (e) {
+    console.warn('posthog identify failed:', e)
+  }
 }
 
 export function reset() {
-  posthog.reset()
+  try {
+    posthog.reset()
+  } catch (e) {
+    console.warn('posthog reset failed:', e)
+  }
 }

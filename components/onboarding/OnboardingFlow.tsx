@@ -26,21 +26,33 @@ export function OnboardingFlow() {
   const [level, setLevel] = useState('')
   const [goal, setGoal] = useState('')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   function handleLevelNext() {
     if (!level) return
-    track('onboarding_started', {})
     setStep(2)
+    track('onboarding_started', {})
   }
 
   async function handleComplete() {
     if (!goal) return
     setLoading(true)
+    setError(null)
+    track('onboarding_completed', { level, daily_goal: parseInt(goal) })
     const fd = new FormData()
     fd.append('level', level)
     fd.append('daily_goal', goal)
-    track('onboarding_completed', { level, daily_goal: parseInt(goal) })
-    await completeOnboarding(fd)
+    try {
+      await completeOnboarding(fd)
+    } catch (e) {
+      // A redirect from the server action lands here as a non-error; only show
+      // a message for real failures so the user isn't stuck on a blank loader.
+      const msg = e instanceof Error ? e.message : ''
+      if (!msg.includes('NEXT_REDIRECT')) {
+        setError('Something went wrong saving your setup. Please try again.')
+        setLoading(false)
+      }
+    }
   }
 
   return (
@@ -126,6 +138,7 @@ export function OnboardingFlow() {
                 </button>
               ))}
             </div>
+            {error && <p className="text-sm text-red-500 mb-3 text-center">{error}</p>}
             <Button
               onClick={handleComplete}
               disabled={!goal || loading}
