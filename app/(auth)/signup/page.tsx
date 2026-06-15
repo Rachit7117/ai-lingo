@@ -1,7 +1,5 @@
 import Link from 'next/link'
 import { SignupForm } from '@/components/auth/SignupForm'
-import { GoogleButton } from '@/components/auth/GoogleButton'
-import { Separator } from '@/components/ui/separator'
 
 export default function SignupPage() {
   return (
@@ -14,14 +12,6 @@ export default function SignupPage() {
         </div>
 
         <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 space-y-6">
-          <GoogleButton label="Sign up with Google" />
-
-          <div className="flex items-center gap-3">
-            <Separator className="flex-1" />
-            <span className="text-xs text-gray-400 font-semibold">or</span>
-            <Separator className="flex-1" />
-          </div>
-
           <SignupForm />
 
           <p className="text-center text-sm text-gray-500">
