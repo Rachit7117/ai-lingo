@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -9,6 +10,7 @@ import { track } from '@/lib/posthog/events'
 import { LoadingScreen } from '@/components/ui/LoadingScreen'
 
 export function SignupForm() {
+  const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -23,6 +25,8 @@ export function SignupForm() {
       setLoading(false)
     } else {
       track('signup_completed', { method: 'email' })
+      // Account created — send them to login with a success banner.
+      router.push('/login?created=1')
     }
   }
 

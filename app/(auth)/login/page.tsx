@@ -1,9 +1,13 @@
 import Link from 'next/link'
 import { LoginForm } from '@/components/auth/LoginForm'
-import { GoogleButton } from '@/components/auth/GoogleButton'
-import { Separator } from '@/components/ui/separator'
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ created?: string }>
+}) {
+  const { created } = await searchParams
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md">
@@ -14,13 +18,11 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 space-y-6">
-          <GoogleButton label="Continue with Google" />
-
-          <div className="flex items-center gap-3">
-            <Separator className="flex-1" />
-            <span className="text-xs text-gray-400 font-semibold">or</span>
-            <Separator className="flex-1" />
-          </div>
+          {created && (
+            <div className="rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-center text-sm font-semibold text-green-700">
+              🎉 Your account is created! Just log in to start learning.
+            </div>
+          )}
 
           <LoginForm />
 

@@ -16,7 +16,13 @@ export async function signUp(formData: FormData) {
   })
 
   if (error) return { error: error.message }
-  redirect('/onboarding')
+
+  // Auto-confirm is on, so signUp creates a session. Sign out so the user
+  // lands cleanly on the login screen (the proxy bounces signed-in users
+  // away from /login otherwise) and logs in fresh.
+  await supabase.auth.signOut()
+
+  return { success: true }
 }
 
 export async function signIn(formData: FormData) {
